@@ -5,7 +5,6 @@ import bm.erciyes.robotvacuumsim.util.DirtType;
 public class Dust extends Dirt {
     public Dust(){
         this.type = DirtType.DUST;
-        this.cleaningTime = 1;
         this.batteryCost = 1;
         this.remainingTime = 1;
     }

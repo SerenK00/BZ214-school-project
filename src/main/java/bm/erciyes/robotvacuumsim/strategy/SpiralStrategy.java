@@ -9,21 +9,23 @@ import java.util.*;
 public class SpiralStrategy implements CleaningStrategy {
 
     private boolean goingRight = true;
-    private List<Direction> pathToUnvisited = new ArrayList<>();
+    private Queue<Direction> pathToUnvisited = new ArrayDeque<>();
 
     @Override
     public Direction nextMove(Robot robot, Room room) {
 
         // BFS ile gidilecek yol varsa takip et
         if (!pathToUnvisited.isEmpty()) {
-            Direction next = pathToUnvisited.remove(0);
+            Direction next = pathToUnvisited.poll();
             // yol geçerliyse devam et
             int nx = robot.getX() + next.getDx();
             int ny = robot.getY() + next.getDy();
-            if (!room.isObstacle(nx, ny)) return next;
-            else pathToUnvisited.clear(); // yol geçersizse sıfırla
+            if (!room.isObstacle(nx, ny))
+                return next;
+            else pathToUnvisited.clear(); // engel varsa yol geçersiz -> sıfırla
         }
 
+        // S şekli için
         Direction horizontal = goingRight ? Direction.EAST : Direction.WEST;
 
         int frontX = robot.getX() + horizontal.getDx();
@@ -39,22 +41,22 @@ public class SpiralStrategy implements CleaningStrategy {
         int downY = robot.getY() + Direction.SOUTH.getDy();
 
         if (!room.isObstacle(downX, downY) && (!room.getCell(downX, downY).isVisited() || room.getCell(downX, downY).hasDirt())) {
-            goingRight = !goingRight;
+            goingRight = !goingRight; // yön değiştirdi
             return Direction.SOUTH;
         }
 
         // sıkıştı — BFS ile en yakın ziyaret edilmemiş hücreyi bul
         pathToUnvisited = findPathToUnvisited(robot, room);
         if (!pathToUnvisited.isEmpty()) {
-            return pathToUnvisited.remove(0);
+            return pathToUnvisited.poll(); // unvisited'a giden path deki ilk elemanı alır
         }
 
         // tüm oda temizlendi
         return robot.getDir();
     }
 
-    private List<Direction> findPathToUnvisited(Robot robot, Room room) {
-        Queue<int[]> queue = new LinkedList<>();
+    private Deque<Direction> findPathToUnvisited(Robot robot, Room room) {
+        Queue<int[]> queue = new ArrayDeque<>();
         boolean[][] seen = new boolean[room.getWidth()][room.getHeight()];
         Direction[][] cameFrom = new Direction[room.getWidth()][room.getHeight()];
 
@@ -88,22 +90,27 @@ public class SpiralStrategy implements CleaningStrategy {
             }
         }
 
-        return new ArrayList<>();
+        return new ArrayDeque<>();
     }
 
-    private List<Direction> reconstructPath(Direction[][] cameFrom, int startX, int startY, int targetX, int targetY) {
-        List<Direction> path = new ArrayList<>();
+     /*
+    reconstructPath() hedef hücreden başlayıp başlangıca doğru geri gidiyor — yol ters sırada oluşuyor.
+    Stack'e push() ile ekleyince başa ekleniyor — her yeni eleman bir öncekinin önüne geçiyor.
+    Sonunda stack'ten çıkınca yol otomatik doğru sırada oluyor. Collections.reverse() kullanmaya gerek kalmıyor.(Arraylisti bu yüzden kullanmadık)
+     */
+    private Deque<Direction> reconstructPath(Direction[][] cameFrom, int startX, int startY, int targetX, int targetY) {
+        // Deque, stack veri yapısını kullanmamıza olanak sağladığı için ArrayDeque kullandık
+        Deque<Direction> stack = new ArrayDeque<>();
         int cx = targetX;
         int cy = targetY;
 
         while (cx != startX || cy != startY) {
             Direction dir = cameFrom[cx][cy];
-            path.add(dir);
+            stack.push(dir);
             cx -= dir.getDx();
             cy -= dir.getDy();
         }
 
-        Collections.reverse(path);
-        return path;
+        return stack;
     }
 }

@@ -16,7 +16,7 @@ public class Room {
         this.height = height;
         this.furnitures = new ArrayList<>();
 
-        // grid oluştur — her hücreyi başlat
+        // grid oluştur
         grid = new Cell[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -45,7 +45,7 @@ public class Room {
 
         if(!isInBounds(x,y))
             return true;
-        return grid[x][y].isObstacle(); // false döner
+        return grid[x][y].isObstacle();
     }
 
     public void addFurniture(int x, int y, int width, int height){
@@ -63,7 +63,9 @@ public class Room {
     public void addDirt(int x, int y, DirtType type) {
         // sınır dışıysa veya engel olan hücreye kir eklenemez
         if (!isInBounds(x, y) || isObstacle(x, y))
-            return; // metotdan hemen çıksın diye return konuldu
+            return;
+            // metotdan hemen çıksın diye return konuldu
+            // guard clause pattern kullanılmış oldu return koyarak, exceptionda fırlatılabilirdi
 
         // kir türüne göre doğru alt sınıf oluşturuluyor
         // polimorfizm — Dirt tipinde tutuyoruz ama Dust/Liquid/Stain olabilir
@@ -82,7 +84,8 @@ public class Room {
         int count = 0;
         List<int[]> unreachable = getUnreachableCells();
 
-        // unreachable hücreleri set'e ekle — hızlı arama için
+        // unreachable hücreleri set'e ekle,hızlı arama için
+        // List'te arama O(n), HashSet'te O(1). Her hücre için contains() çağrılacağı için hız önemli.
         Set<String> unreachableSet = new HashSet<>();
         for (int[] uc : unreachable) {
             unreachableSet.add(uc[0] + "," + uc[1]);
@@ -96,7 +99,7 @@ public class Room {
         }
         return count;
     }
-    // tam temizlenmiş hücreleri sayar — kiri olmayan ve ziyaret edilmiş
+    // tam temizlenmiş hücreleri sayar (kiri olmayan ve ziyaret edilmiş)
     public int getFullyCleanedCells() {
         int count = 0;
         for (int x = 0; x < width; x++) {
@@ -112,11 +115,10 @@ public class Room {
         int count = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                // hücrede kir varsa say
-                if (grid[x][y].hasDirt()) count++;
+                if (grid[x][y].hasDirt())
+                    count++;
             }
         }
-        // kirli hücre sayısı döndürülüyor
         return count;
     }
 
@@ -125,12 +127,13 @@ public class Room {
         BFS algoritması
         Şarj istasyonundan başlar
         4 yönde genişler — obstacle olmayanları işaretler
-        Sonunda işaretlenmemiş obstacle olmayan hücreler → unreachable
+        Sonunda işaretlenmemiş obstacle olmayan hücreler unreachable olur
         getTotalCleanableCells() ve RoomPane.update() içinde kullanılır
          */
 
+        // hepsi false (default olarak geldi)
         boolean[][] reachable = new boolean[width][height];
-        Queue<int[]> queue = new LinkedList<>();
+        Queue<int[]> queue = new ArrayDeque<>();
 
         // şarj istasyonundan BFS başlat
         int startX = station.getX();
@@ -139,7 +142,7 @@ public class Room {
         reachable[startX][startY] = true;
 
         while (!queue.isEmpty()) {
-            int[] current = queue.poll();
+            int[] current = queue.poll(); // sıradan hücre al
             int cx = current[0];
             int cy = current[1];
 
@@ -154,6 +157,7 @@ public class Room {
         }
 
         // ulaşılamayan engel olmayan hücreler
+        // sona ekleme yapılıyor ArrayList tercih edildi
         List<int[]> unreachable = new ArrayList<>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

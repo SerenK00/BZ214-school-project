@@ -4,28 +4,28 @@ import bm.erciyes.robotvacuumsim.util.DirtType;
 
 public abstract class Dirt {
 
-    // Dust, Liquid, Stain birbirinden farklı davranır ama hepsi "kir"dir.
-    // Ortak alanları burada tanımlayıp alt sınıflara miras bırakıyoruz.
-    // Dirt nesnesi direkt oluşturulamaz, sadece alt sınıflardan oluşturulur.
-    // Protected yapılmasının sebebi alt sınıfların erişebilmesi içindir
+     /*
+      Dust, Liquid, Stain birbirinden farklı davranır ama hepsi "kir"dir.
+      Ortak alanları burada tanımlayıp alt sınıflara miras bırakıyoruz.
+      Dirt nesnesi direkt oluşturulamaz, sadece alt sınıflardan oluşturulur.
+      Protected yapılmasının sebebi alt sınıfların erişebilmesi içindir
+     */
 
     // Kir türü — DUST, LIQUID veya STAIN
     protected DirtType type;
 
-    // Toplam kaç tick sürer temizlemek
-    protected int cleaningTime;
 
-    // Temizlerken ekstra ne kadar batarya harcar
+    // Temizlerken ekstra ne kadar batarya harcanacak
     protected int batteryCost;
 
-    // Kalan temizleme süresi — her tick'te azalır
+    // Ne kadar sürede temizlenecek, her tick'te azalır
     protected int remainingTime;
 
-    // Her tick'te çağrılır — alt sınıflar implement eder
-    // abstract çünkü her kir türü farklı davranabilir
+    // Her tick'te çağrılır, alt sınıflar implement eder
+    // Abstract çünkü her kir türü farklı davranabilir
     public abstract void clean();
 
-    // Temizlendi mi? — remainingTime sıfırsa bitti
+    // remainingTime sıfırsa temizlendi
     public boolean isClean() {
         return remainingTime <= 0;
     }

@@ -2,20 +2,23 @@ package bm.erciyes.robotvacuumsim.model;
 
 public class Cell {
 
+    // Bu hücrenin oda içindeki koordinatları
     private int x;
     private int y;
 
-    // Duvar veya mobilya varsa true, robot buradan geçemez (CollisionHandler kullanır)
+    // Duvar veya mobilya varsa true — robot buradan geçemez (CollisionHandler kullanır)
     private boolean isObstacle;
 
+    // Robot buradan geçtiyse true — yol çizimi ve istatistik için
     private boolean isVisited;
 
-    // Kir
+    // Hücredeki kir — temizse null - Polimorfizm kullanılır
     private Dirt dirt;
 
     // Şarj istasyonu mu?
     private boolean isCharger;
 
+    // Constructor — hücre oluşturulunca koordinatları ver
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;
@@ -25,15 +28,17 @@ public class Cell {
         this.isCharger = false;
     }
 
-    // dirt null değilse kir vardır
+    // Kir var mı? — dirt null değilse kir var demektir
     public boolean hasDirt() {
         return dirt != null;
     }
 
+    // Kiri temizle — null yap
     public void removeDirt() {
         this.dirt = null;
     }
 
+    // Getterlar ve Setterlar
     public int getX() { return x; }
     public int getY() { return y; }
 

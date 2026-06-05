@@ -18,14 +18,11 @@ public class RandomStrategy implements CleaningStrategy {
         List<Direction> visited = new ArrayList<>();
 
         for (Direction dir : directions) {
-            // 4 yönün her biri için komşu hücreyi hesaplanır
             int newX = robot.getX() + dir.getDx();
             int newY = robot.getY() + dir.getDy();
 
-            if (room.isObstacle(newX, newY))
-                continue;
-            if (room.getCell(newX, newY).isCharger() && robot.getBat().getLevel() > 30)
-                continue;
+            if (room.isObstacle(newX, newY)) continue;
+            if (room.getCell(newX, newY).isCharger() && robot.getBat().getLevel() > 30) continue;
 
             if (!room.getCell(newX, newY).isVisited() || room.getCell(newX, newY).hasDirt()) {
                 unvisited.add(dir); // kirli hücreler de unvisited sayılsın
@@ -52,12 +49,9 @@ public class RandomStrategy implements CleaningStrategy {
     }
 
     // BFS ile en yakın ziyaret edilmemiş hücreye giden ilk adımı döndür
-    // BFS her bir tick de tüm odayı tarar. (oda boyutumuz küçük olduğu için bir sorun çıkarmaz ama oda büyük olduğunda
-    // performans sorunu olabilirdi
     private Direction findNearestUnvisited(Robot robot, Room room) {
-        Queue<int[]> queue = new ArrayDeque<>();
+        Queue<int[]> queue = new LinkedList<>();
         boolean[][] seen = new boolean[room.getWidth()][room.getHeight()];
-        // her hücre için başlangıç hücresinden hangi yönde yola çıkılarak buraya(mevcut hücreye) geldiğini tutar
         Direction[][] firstDir = new Direction[room.getWidth()][room.getHeight()];
 
         int startX = robot.getX();
@@ -71,24 +65,21 @@ public class RandomStrategy implements CleaningStrategy {
             int cx = current[0];
             int cy = current[1];
 
-            // ziyaret edilmemiş veya kirli hücre bulundu
+            // ziyaret edilmemiş hücre bulundu
             if ((!room.getCell(cx, cy).isVisited() || room.getCell(cx, cy).hasDirt()) && (cx != startX || cy != startY)) {
-                return firstDir[cx][cy]; // başlangıçtan bu hücreye giden ilk adım döndürülür.
+                return firstDir[cx][cy];
             }
 
             for (Direction dir : Direction.values()) {
                 int nx = cx + dir.getDx();
                 int ny = cy + dir.getDy();
 
-                if (!room.isInBounds(nx, ny))
-                    continue;
-                if (room.isObstacle(nx, ny))
-                    continue;
-                if (seen[nx][ny])
-                    continue;
+                if (!room.isInBounds(nx, ny)) continue;
+                if (room.isObstacle(nx, ny)) continue;
+                if (seen[nx][ny]) continue;
 
                 seen[nx][ny] = true;
-                // başlangıç noktasından ilk adımı kaydet(her tick de değişiyor)
+                // başlangıç noktasından ilk adımı kaydet
                 firstDir[nx][ny] = (cx == startX && cy == startY) ? dir : firstDir[cx][cy];
                 queue.add(new int[]{nx, ny});
             }

@@ -4,19 +4,17 @@ public class SimulationState {
 
     private int collectedDirt;
 
-    /*
-    Java'da zaman almak için:
-    System.currentTimeMillis() kullanılır ve long döndürür
-    bu yüzden startTime ve elapsedTime 'ı long türünde tanımladık
-     */
+    // Java'da zaman almak için:
+    // System.currentTimeMillis() kullanılır ve long döndürür
+    // bu yüzden startTime ve elapsedTime 'ı long türünde tanımladık
 
     private long startTime;
     private long elapsedTime;
 
     /*
-    running=true, paused=false -> çalışıyor
-    running=false, paused=true -> duraklatıldı
-    running=false, paused=false -> hiç başlamadı veya reset
+    running=true, paused=false → çalışıyor
+    running=false, paused=true → duraklatıldı
+    running=false, paused=false → hiç başlamadı veya reset
      */
     private boolean running;
     private boolean paused;

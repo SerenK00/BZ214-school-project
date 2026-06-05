@@ -8,40 +8,37 @@ import java.util.*;
 
 public class WallFollowStrategy implements CleaningStrategy {
 
-    private Queue<Direction> currentPath = new ArrayDeque<>();
+    private List<Direction> currentPath = new ArrayList<>();
 
     @Override
     public Direction nextMove(Robot robot, Room room) {
 
         // mevcut yol varsa takip et
         if (!currentPath.isEmpty()) {
-            Direction next = currentPath.poll();
+            Direction next = currentPath.remove(0);
             int nx = robot.getX() + next.getDx();
             int ny = robot.getY() + next.getDy();
-            if (!room.isObstacle(nx, ny))
-                return next;
+            if (!room.isObstacle(nx, ny)) return next;
             else currentPath.clear();
         }
 
         // frontier bul — en yakın keşfedilmemiş sınır hücresi
         Direction dir = findNearestFrontier(robot, room);
-        if (dir != null)
-            return dir;
+        if (dir != null) return dir;
 
         // frontier kalmadıysa rastgele git
         for (Direction d : Direction.values()) {
             int nx = robot.getX() + d.getDx();
             int ny = robot.getY() + d.getDy();
-            if (!room.isObstacle(nx, ny))
-                return d;
+            if (!room.isObstacle(nx, ny)) return d;
         }
 
         return robot.getDir();
     }
 
-    // frontier: Ziyaret edilmiş alan ile ziyaret edilmemiş alanın sınır hücresi.
+    // frontier: ziyaret edilmiş hücrenin yanında ziyaret edilmemiş hücre
     private Direction findNearestFrontier(Robot robot, Room room) {
-        Queue<int[]> queue = new ArrayDeque<>();
+        Queue<int[]> queue = new LinkedList<>();
         boolean[][] seen = new boolean[room.getWidth()][room.getHeight()];
         Direction[][] cameFrom = new Direction[room.getWidth()][room.getHeight()];
 
@@ -59,9 +56,10 @@ public class WallFollowStrategy implements CleaningStrategy {
             // frontier mı? — ziyaret edilmemiş ve komşusu ziyaret edilmiş
             if ((!room.getCell(cx, cy).isVisited() || room.getCell(cx, cy).hasDirt()) && (cx != startX || cy != startY)) {
                 if (hasFrontierNeighbor(cx, cy, room)) {
-                    currentPath = reconstructPath(cameFrom, startX, startY, cx, cy);
-                    if (!currentPath.isEmpty()) {
-                        return currentPath.poll();
+                    List<Direction> path = reconstructPath(cameFrom, startX, startY, cx, cy);
+                    if (!path.isEmpty()) {
+                        currentPath = path;
+                        return currentPath.remove(0);
                     }
                 }
             }
@@ -88,27 +86,26 @@ public class WallFollowStrategy implements CleaningStrategy {
         for (Direction dir : Direction.values()) {
             int nx = x + dir.getDx();
             int ny = y + dir.getDy();
-            if (!room.isInBounds(nx, ny))
-                continue;
-            if (room.isObstacle(nx, ny))
-                continue;
-            if (room.getCell(nx, ny).isVisited() && !room.getCell(nx, ny).hasDirt())
-                return true;
+            if (!room.isInBounds(nx, ny)) continue;
+            if (room.isObstacle(nx, ny)) continue;
+            if (room.getCell(nx, ny).isVisited() && !room.getCell(nx, ny).hasDirt()) return true;
         }
         return false;
     }
 
-    private Deque<Direction> reconstructPath(Direction[][] cameFrom, int startX, int startY, int targetX, int targetY) {
-        Deque<Direction> stack = new ArrayDeque<>();
+    private List<Direction> reconstructPath(Direction[][] cameFrom, int startX, int startY, int targetX, int targetY) {
+        List<Direction> path = new ArrayList<>();
         int cx = targetX;
         int cy = targetY;
 
         while (cx != startX || cy != startY) {
             Direction dir = cameFrom[cx][cy];
-            stack.push(dir);
+            path.add(dir);
             cx -= dir.getDx();
             cy -= dir.getDy();
         }
-        return stack;
+
+        Collections.reverse(path);
+        return path;
     }
 }

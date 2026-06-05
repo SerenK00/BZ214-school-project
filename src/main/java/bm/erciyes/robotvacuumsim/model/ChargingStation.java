@@ -10,6 +10,7 @@ public class ChargingStation {
     private int y;
 
     public ChargingStation(int x, int y){
+        // station koordinatları belirleniyor
         this.x = x;
         this.y = y;
 

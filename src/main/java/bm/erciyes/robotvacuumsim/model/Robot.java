@@ -20,6 +20,8 @@ public class Robot {
     //  robotun durumu. MOVING, CLEANING, CHARGING, RETURNING, IDLE. UI'da gösterilir ve SimulationController'da karar vermede kullanılır
     private RobotStatus robotStatus;
 
+    // esneklik olması için list yapıldı
+    // ilerde linkedlist yapmam gerekirse, constructorda arraylist yerine linkedlist yazarım
     private List<int[]> path;
 
 
@@ -55,7 +57,7 @@ public class Robot {
          kiri bir tick temizler, batarya harcar, kir bittiyse hücreden kaldırır
         */
 
-        //  kir var mı
+        // hücrede kir var mı kontrol et
         if(cell.hasDirt()){
 
             // kiri bir tick temizle (remainingTime azalır)
@@ -65,7 +67,9 @@ public class Robot {
             // Dust=1, Liquid=3, Stain=5
             bat.drain(cell.getDirt().getBatteryCost());
 
+            // temizlendi mi? (remainingTime == 0)
             if(cell.getDirt().isClean())
+                // kiri hücreden kaldır
                 cell.removeDirt();
         }
     }

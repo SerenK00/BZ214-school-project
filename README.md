@@ -54,8 +54,16 @@ src/
 git clone https://github.com/SerenK00/BZ214-school-project.git
 ```
 2. Open the project with IntelliJ IDEA
-3. Make sure Java 21 and JavaFX 21 are configured
-4. Run `Launcher.java`
+3. `File` → `Project Structure` → `Project` → `SDK` → Java 21 or higher select
+4. Click `Load` on the Maven popup (bottom right)
+5. Run `Launcher.java`
+
+### Opening from ZIP
+1. Extract the ZIP file
+2. Open with IntelliJ IDEA
+3. `File` → `Project Structure` → `Project` → `SDK` → Java 21 or higher select
+4. Click `Load` on the Maven popup (bottom right)
+5. Run `Launcher.java`
 
 ## How to Use
 - **Add dirt** — click "Kir Ekle" button, select dirt type, click on the grid
